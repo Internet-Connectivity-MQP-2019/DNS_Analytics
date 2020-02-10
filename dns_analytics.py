@@ -9,10 +9,10 @@ import us
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("-z", default=2, type=int)
-    parser.add_argument("-v", default=0.1, type=float)
-    parser.add_argument("-c", default="rtt", type=str)
-    parser.add_argument("-w", default=None, type=str)
+    parser.add_argument("-z", default=2, type=int, help="Maximum z score for a pair of servers. Default is 2")
+    parser.add_argument("-v", default=0.1, type=float, help="Maximum coefficient of variation for a point of measurement between a pair of servers. Default is 0.1")
+    parser.add_argument("-c", default="rtt", type=str, help="rtt or rtt_normalized. Default is rtt")
+    parser.add_argument("-w", default=None, type=str, help="Path to a weights file. Default is  None")
     args = parser.parse_args()
 
     column = args.c
@@ -55,6 +55,7 @@ def main():
     state_rankings = pairs.groupby(['recursive_state'])[['median']].agg([np.median, 'count'])
     state_rankings.columns = state_rankings.columns.droplevel()
     state_rankings = state_rankings.sort_values('median')
+    state_rankings['rank'] = state_rankings['median'].rank(method='max')
 
     state_to_state_p_values = pd.DataFrame()
     state_to_state_p_values_i = pd.DataFrame()
